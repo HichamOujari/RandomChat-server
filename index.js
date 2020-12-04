@@ -7,6 +7,9 @@ const io = require('socket.io')(http,{
       methods: ["GET", "POST"]
     }
   })
+app.get('/', function(req, res) {
+  res.send('hello world');
+});
 var count=0;
 var Rooms = [];
 function addRoom(id) {
