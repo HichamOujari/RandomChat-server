@@ -3,7 +3,7 @@ const app = express()
 const http = require("http").Server(app)
 const io = require('socket.io')(http,{
     cors: {
-      origin: "https://randomchat-server.herokuapp.com/:3000",
+      origin: "https://randomchat-server.herokuapp.com:3000",
       methods: ["GET", "POST"]
     }
   })
