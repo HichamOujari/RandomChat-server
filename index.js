@@ -4,7 +4,7 @@ const http = require("http").Server(app)
 const PORT = process.env.PORT
 const io = require('socket.io')(http,{
     cors: {
-      origin: "https://myrandchat.herokuapp.com/:3000",
+      origin: "https://myrandchat.herokuapp.com",
       methods: ["GET", "POST"]
     }
   })
