@@ -2,6 +2,7 @@ const express = require("express");
 const { emit } = require("process");
 const app = express()
 const http = require("http").Server(app)
+const PORT = process.env.PORT
 const io = require('socket.io')(http,{
     cors: {
       origin: "https://myrandchat.herokuapp.com",
@@ -67,6 +68,15 @@ function exite(id) {
 }
 
 io.on('connection',socket =>{
+<<<<<<< HEAD
+=======
+    socket.on('disconnect',() =>{
+      --count;
+      SuppFroomRoom(socket.id)
+      io.to(socket.id).emit("port",PORT);
+      io.emit('count',count)
+    })
+>>>>>>> 81bd3d8d30ad0b68fdf5c32cd6e1d8bf03c013fd
     count++;
     io.emit('count',count);
     socket.on("mydata",data=>{
@@ -90,6 +100,12 @@ io.on('connection',socket =>{
     })
   })
 
+<<<<<<< HEAD
 http.listen(process.env.PORT,()=>{
     console.log("listening on port : 4000");
 })
+=======
+http.listen(PORT,()=>{
+    console.log("listening on port : 4000")
+})
+>>>>>>> 81bd3d8d30ad0b68fdf5c32cd6e1d8bf03c013fd
