@@ -68,15 +68,6 @@ function exite(id) {
 }
 
 io.on('connection',socket =>{
-<<<<<<< HEAD
-=======
-    socket.on('disconnect',() =>{
-      --count;
-      SuppFroomRoom(socket.id)
-      io.to(socket.id).emit("port",PORT);
-      io.emit('count',count)
-    })
->>>>>>> 81bd3d8d30ad0b68fdf5c32cd6e1d8bf03c013fd
     count++;
     io.emit('count',count);
     socket.on("mydata",data=>{
@@ -99,13 +90,6 @@ io.on('connection',socket =>{
       io.emit('count',count);
     })
   })
-
-<<<<<<< HEAD
-http.listen(process.env.PORT,()=>{
-    console.log("listening on port : 4000");
-})
-=======
 http.listen(PORT,()=>{
-    console.log("listening on port : 4000")
+    console.log("listening on port : ",PORT)
 })
->>>>>>> 81bd3d8d30ad0b68fdf5c32cd6e1d8bf03c013fd
