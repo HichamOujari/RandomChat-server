@@ -1,77 +1,95 @@
-const express = require("express")
+const express = require("express");
+const { emit } = require("process");
 const app = express()
 const http = require("http").Server(app)
 const io = require('socket.io')(http,{
     cors: {
-      origin: "https://myrandchat.herokuapp.com/:3000",
+      origin: "https://myrandchat.herokuapp.com",
       methods: ["GET", "POST"]
     }
   })
-app.get('/', function(req, res) {
-  res.send('hello world');
-});
 var count=0;
-var Rooms = [];
-function addRoom(id) {
-  for(p=0;p<Rooms.length;p++){  
-    if(Rooms[p].id1==' '){
-      Rooms[p].id1=id;
-      io.to(Rooms[p].id2).emit('coId',{id:id,name:"Randomly"})
-      io.to(Rooms[p].id1).emit('coId',{id:Rooms[p].id2,name:"Randomly"})
-      return ++p;
-    }else if(Rooms[p].id2==' '){
-      Rooms[p].id2=id;
-      io.to(Rooms[p].id1).emit('coId',{id:id,name:"Randomly"})
-      io.to(Rooms[p].id2).emit('coId',{id:Rooms[p].id1,name:"Randomly"})
-      return ++p;
+var Rooms=[];
+function addRoom(data) {
+  var nbr = Rooms.length;
+  for(i=nbr-1;i>=0;--i){
+    if(Rooms[i].id1==" "){
+      Rooms[i].id1=data.id;
+      Rooms[i].name1=data.name;
+      Rooms[i].peerid1=data.peerid;
+      io.to(Rooms[i].id2).emit("couser",data);
+      io.to(Rooms[i].id1).emit("couser",{id:Rooms[i].id2,name:Rooms[i].name2,peerid:Rooms[i].peerid2});
+      return 1;
+    }if(Rooms[i].id2==" "){
+      Rooms[i].id2=data.id;
+      Rooms[i].name2=data.name;
+      Rooms[i].peerid2=data.peerid;
+      io.to(Rooms[i].id1).emit("couser",data);
+      io.to(Rooms[i].id2).emit("couser",{id:Rooms[i].id1,name:Rooms[i].name1,peerid:Rooms[i].peerid1});
+      return 1;
     }
   }
-  Rooms.push({id1:id,id2:" "})
-  return Rooms.length;
+  Rooms.push({id1:data.id,name1:data.name,peerid1:data.peerid,id2:" ",name2:" ",peerid2:" "});
+  return 1;
 }
 
-function SuppFroomRoom(id){
-  for(p=0;p<Rooms.length;p++){
-    if(Rooms[p].id1==id){
-      Rooms[p].id1=' ';
-      io.to(Rooms[p].id2).emit('exited',"")
-    }else if(Rooms[p].id2==id){
-      Rooms[p].id2=' ';
-      io.to(Rooms[p].id1).emit('exited',"")
-    }
-    if(Rooms[p].id2==" " && Rooms[p].id1==" "){
-      Rooms.splice(p, 1);
+function clean() {
+  for(k=0;k<Rooms.length;k++){
+    if(Rooms[k].id2=="occuped" && Rooms[k].id1=="occuped" ){
+      Rooms.splice(k,1);
+      nbr = Rooms.length;
+    }else if(Rooms[k].id2==" " && Rooms[k].id1=="occuped"){
+      Rooms.splice(k,1);
+      nbr = Rooms.length;
+    }else if(Rooms[k].id2=="occuped" && Rooms[k].id1==" "){
+      Rooms.splice(k,1);
+      nbr = Rooms.length;
     }
   }
 }
 
-function exchange(id) {
-  SuppFroomRoom(id.id)
-  SuppFroomRoom(id.coid)
-  addRoom(id.id)
-  addRoom(id.coid)
+function exite(id) {
+  for(j=0;j<Rooms.length;j++){
+    if(Rooms[j].id1===id){
+      Rooms[j].id1="occuped";
+      io.to(Rooms[j].id2).emit("exited");
+      clean();
+      return 1;
+    }
+    if(Rooms[j].id2===id){
+      Rooms[j].id2="occuped";
+      io.to(Rooms[j].id1).emit("exited");
+      clean();
+      return 1;
+    }
+  }
+  return 0;
 }
+
 io.on('connection',socket =>{
+    count++;
+    io.emit('count',count);
+    socket.on("mydata",data=>{
+      addRoom({id:socket.id,name:data.name,peerid:data.peerid});
+      io.to(socket.id).emit("mydata",socket.id)
+    })
+    socket.on("new_msg",data=>{
+      io.to(data.to).emit("new_msg",data);
+    })
+    socket.on("skip",(data)=>{
+      exite(socket.id);
+      addRoom({id:socket.id,name:data.name,peerid:data.peerid})
+    })
+    socket.on("camera",data=>{
+      io.to(data.to).emit("camera",data.camera);
+    })
     socket.on('disconnect',() =>{
       --count;
-      SuppFroomRoom(socket.id)
-      io.emit('count',count)
-    })
-    count++;
-    io.emit('count',count)
-    io.to(socket.id).emit('id',socket.id)
-    var room = addRoom(socket.id)
-    socket.on('new_message',(data)=>{
-        if(data.to!==' '){
-          io.to(data.to).emit('message',data)
-          io.to(data.id).emit('message',data)
-        }
-    })
-    socket.on('skip',(data)=>{
-        exchange(data)
+      exite(socket.id);
+      io.emit('count',count);
     })
   })
 
-http.listen(4000,()=>{
-    console.log("listening on port : 4000")
+http.listen(process.env.PORT,()=>{
+    console.log("listening on port : 4000");
 })
