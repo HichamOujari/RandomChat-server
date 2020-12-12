@@ -68,7 +68,10 @@ function exite(id) {
   }
   return 0;
 }
-
+setInterval(() => {
+  console.log("------------------------");
+  console.log(Rooms);
+}, 5000);
 io.on('connection',socket =>{
     count++;
     io.emit('count',count);
