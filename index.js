@@ -2,10 +2,12 @@ const express = require("express");
 const { emit } = require("process");
 const app = express()
 const http = require("http").Server(app)
-const PORT = process.env.PORT
+const PORT = process.env.PORT 
+//const PORT = 4000;
 const io = require('socket.io')(http,{
     cors: {
-      origin: "https://myrandchat.herokuapp.com",
+      //origin: "https://myrandchat.herokuapp.com",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"]
     }
   })
@@ -80,9 +82,6 @@ io.on('connection',socket =>{
     socket.on("skip",(data)=>{
       exite(socket.id);
       addRoom({id:socket.id,name:data.name,peerid:data.peerid})
-    })
-    socket.on("camera",data=>{
-      io.to(data.to).emit("camera",data.camera);
     })
     socket.on('disconnect',() =>{
       --count;
