@@ -2,8 +2,8 @@ const express = require("express");
 const { emit } = require("process");
 const app = express()
 const http = require("http").Server(app)
-//const PORT = process.env.PORT 
-const PORT = 4000;
+const PORT = process.env.PORT 
+//const PORT = 4000;
 const io = require('socket.io')(http,{
     cors: {
       //origin: "https://myrandchat.herokuapp.com",
