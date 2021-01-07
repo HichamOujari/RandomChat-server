@@ -6,8 +6,8 @@ const PORT = process.env.PORT
 //const PORT = 4000;
 const io = require('socket.io')(http,{
     cors: {
-      //origin: "https://myrandchat.herokuapp.com",
-      origin: "http://localhost:3000",
+      origin: "https://myrandchat.herokuapp.com",
+      //origin: "http://localhost:3000",
       methods: ["GET", "POST"]
     }
   })
