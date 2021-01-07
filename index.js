@@ -2,12 +2,12 @@ const express = require("express");
 const { emit } = require("process");
 const app = express()
 const http = require("http").Server(app)
-const PORT = process.env.PORT 
-//const PORT = 4000;
+//const PORT = process.env.PORT 
+const PORT = 4000;
 const io = require('socket.io')(http,{
     cors: {
-      origin: "https://myrandchat.herokuapp.com",
-      //origin: "http://localhost:3000",
+      //origin: "https://myrandchat.herokuapp.com",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"]
     }
   })
@@ -68,10 +68,6 @@ function exite(id) {
   }
   return 0;
 }
-setInterval(() => {
-  console.log("------------------------");
-  console.log(Rooms);
-}, 5000);
 io.on('connection',socket =>{
     count++;
     io.emit('count',count);
